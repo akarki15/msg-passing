@@ -5,82 +5,70 @@ import java.io.IOException;
 
 public class Utilities {
 
-	static int[][] readFile(String fileName) {
-		// Declare and initialize with zero values.
-		int counter = 0;
-		int size = 0;
-		int[][] input = {};
+	static int[][] getBlock(String fileName, int row, int col,
+			int intermediateLength) {
+		// intermediateLength for nXn intermediate matrix will be n, row=m,
+		// col=n
 
+		int sizeOfCell = getSizeOfInput(fileName) / intermediateLength;
+		int startx = row * sizeOfCell;
+		int starty = col * sizeOfCell;
+		int counter = 0;
+		
+		int[][] input = new int [sizeOfCell][sizeOfCell];
 		try {
 			FileReader fileReader = new FileReader(new File(fileName));
-			BufferedReader bf = new BufferedReader(fileReader);
-			String s;
-			while ((s = bf.readLine()) != null) {
+			BufferedReader br = new BufferedReader(fileReader);
+
+			for (int i = 0; i < startx - 1; i++) {
+				br.readLine();
+			}
+
+			for (int i = 0; i < startx ; i++) {
 				/*
 				 * Decide the size of matrix after having read the first line of
 				 * the input file
 				 */
-				int[] parsedLine = parseLine(s);
-				if (size == 0) {
-					size = parsedLine.length;
-					input = new int[size][size];
-					System.out.println(size+" is the size.");
-				}
-				input[counter++] = parsedLine;
-			}
-			bf.close();
+				String s = br.readLine();
+//				System.out.println(s+" --->>>>"+i+"++++"+sizeOfCell);
+				int[] parsedLine = parseLine(s, starty, sizeOfCell);				
+				input[i] = parsedLine;
+			}			
+			br.close();
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
 		return input;
+
 	}
 
-	static int[] parseLine(String s) {
-		String[] sList = s.split("\\ "); // Use space as delimiter
-		int[] lineInt = new int[sList.length];
-		for (int i = 0; i < sList.length; i++) {
-			lineInt[i] = Integer.parseInt(sList[i]);
+	static int getSizeOfInput(String fileName) {
+		int size = 0;
+		try {			
+			FileReader fileReader = new FileReader(new File(fileName));
+			BufferedReader bf = new BufferedReader(fileReader);
+			String s;
+			s = bf.readLine();
+			String[] sList = s.split("\\ "); // Use space as delimiter
+			size = sList.length;
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
 		}
+		return size;
+	}
+
+	static int[] parseLine(String s, int starty, int sizeOfCell) {
+		String[] sList = s.split("\\ "); // Use space as delimiter
+		
+		int[] lineInt = new int[sizeOfCell];
+		for (int i = 0; i < sizeOfCell; i++) {
+			lineInt[i] = Integer.parseInt(sList[starty+i]);
+//			System.out.print(lineInt[i]);
+		}		
 		return lineInt;
 	}
 
-	public static int[][][] divide(int[][] a, int p, int inputSize) {
-
-		int sub = (int) Math.cbrt(p * p);
-		int sq = (int) Math.sqrt(sub);
-		int dividedSize = inputSize / sub;
-		int divided = (a.length) / (sq);
-
-		int[][][] dividedMatrix = new int[sub][divided][divided];
-
-		for (int m = 0; m <= sq - 1; m++) {// m and n help start at the correct
-											// beginning location
-			for (int n = 0; n <= sq - 1; n++) {
-				int startk = n * divided;
-				int startl = m * divided;
-				int x = m * sq + n; // determines which spot in the three
-									// dimmensional array the subarray will go
-									// into
-				for (int y = 0; y <= divided - 1; y++) {
-					for (int z = 0; z <= divided - 1; z++) {
-						dividedMatrix[x][y][z] = a[startk + y][startl + z];
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i <= dividedMatrix.length - 1; i++) {
-			for (int j = 0; j <= dividedMatrix[0].length - 1; j++) {
-				for (int k = 0; k <= dividedMatrix[0][j].length - 1; k++) {
-					// System.out.print(dividedMatrix[i][j][k] + " ");
-				}
-				// System.out.println();
-			}
-			// System.out.println(dividedMatrix.length + " ");
-		}
-		return dividedMatrix;
-	}
-
+	
 	public static void printMatrix(int[][] matrix) {
 		int size = matrix.length;
 		for (int i = 0; i < size; i++) {
@@ -93,6 +81,8 @@ public class Utilities {
 
 	static int[][] multiply(int[][] a, int[][] b) {
 		int size = a.length;
+		printMatrix(a);
+		printMatrix(b);
 		int[][] output = new int[size][size];
 
 		for (int i = 0; i < size; i++) { // row
@@ -108,4 +98,11 @@ public class Utilities {
 		return output;
 	}
 
+	public static String charArrayToString(char[] array) {
+		String s = "";
+		for (char a : array) {
+			s += a;
+		}
+		return s;
+	}
 }
