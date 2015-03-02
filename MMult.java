@@ -21,20 +21,22 @@ class MMult {
 			System.out.println("Rank " + myrank + " is on "
 					+ MPI.Get_processor_name());
 			int[] message = new int[5];
-			char [][] filePaths = new char[2][6];
+			char[][] filePaths = new char[2][6];
 
 			MPI.COMM_WORLD.Recv(message, 0, 5, MPI.INT, 0, tag);
-			
+
 			MPI.COMM_WORLD.Recv(filePaths, 0, 2, MPI.OBJECT, 0, tag);
-//			System.out.println("Hey2");
-			
-			int[][] m1 = Utilities.getBlock(Utilities.charArrayToString(filePaths[0]), message[0],
+
+			int[][] m1 = Utilities.getBlock(
+					Utilities.charArrayToString(filePaths[0]), message[0],
 					message[1], message[4]);
-			int[][] m2 = Utilities.getBlock(Utilities.charArrayToString(filePaths[1]), message[2],
+			int[][] m2 = Utilities.getBlock(
+					Utilities.charArrayToString(filePaths[1]), message[2],
 					message[3], message[4]);
-			
+
 			int[][] product = Utilities.multiply(m1, m2);
-//			Utilities.printMatrix(product);
+			// Utilities.printMatrix(product);
+			Utilities.writeMatrix(m1, message[0]+"_"+message[1]+"_"+message[2]+"_"+message[3]+".txt");
 			
 			MPI.COMM_WORLD.Send(product, 0, 1, MPI.OBJECT, 0, tag);
 
@@ -57,13 +59,29 @@ class MMult {
 				file1 = "a1.txt";
 				file2 = "b1.txt";
 			} else {
-				file1 = "a2.txt";
-				file2 = "b2.txt";
+				file1 = "a3.txt";
+				file2 = "b3  .txt";
 			}
-			file1 = System.getProperty("user.dir") + "/input/" + file1;
-			file2 = System.getProperty("user.dir") + "/input/" + file2;
+//			file1 = System.getProperty("user.dir") + "/input/" + file1;
+//			file2 = System.getProperty("user.dir") + "/input/" + file2;
+			file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
+			file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/"+ file2;
+			
+			b = true;
+			while (b) {
+				Scanner reader = new Scanner(System.in);
+				System.out
+						.println("Press 1 to run 8 ways parallel, and 2 to run 64 ways parallel");
+				choice = reader.nextInt();
+				if (choice == 1 || choice == 2)
+					b = false;
+			}
 
-			send(file1, file2, tag, 2);
+			if (choice == 1) {
+				send(file1, file2, tag, 2);
+			} else {
+				send(file1, file2, tag, 4);
+			}
 
 			// send(tag, 4);
 
@@ -81,10 +99,10 @@ class MMult {
 			for (int j = 0; j < size; j++) {
 				for (int k = 0; k < size; k++) {
 					int[] message = { i, k, k, j, size };
-					char[][] filePaths = {file1.toCharArray(),
-							file2.toCharArray()};
+					char[][] filePaths = { file1.toCharArray(),
+							file2.toCharArray() };
 					MPI.COMM_WORLD.Send(message, 0, 5, MPI.INT, dest, tag);
-					MPI.COMM_WORLD.Send(filePaths, 0, 2, MPI.OBJECT, dest, tag);					
+					MPI.COMM_WORLD.Send(filePaths, 0, 2, MPI.OBJECT, dest, tag);
 					dest++;
 				}
 			}
