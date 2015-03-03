@@ -43,6 +43,13 @@ class MMult {
 
 			Utilities.writeMatrix(product, fullPath);
 
+			 Utilities.writeMatrix(m1,System.getProperty("user.dir") +
+			 "/blocks/"
+			 + myrank+"_"+1);
+			 Utilities.writeMatrix(m2,System.getProperty("user.dir") +
+			 "/blocks/"
+			 + myrank+"_"+2);
+
 			int n = message[4]; // represents the size of the input matrix nXn
 			if (myrank % 2 == 0) { // assumes process 0 is not used for actual
 									// computation
@@ -71,12 +78,13 @@ class MMult {
 					MPI.COMM_WORLD.Recv(previousSumFile, 0,
 							receivingFileLength[0], MPI.CHAR, myrank - 2, tag);
 					// do the level 2 addition
-					addAndWrite(sumFile,
-							Utilities.charArrayToString(previousSumFile), 2);
-				} else {
-					int[] fileNameLength = { sumFile.length() };
-					MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT, myrank
-							+ f2, tag);
+					Utilities.addAndWrite(
+							Utilities.charArrayToString(previousSumFile),
+							sumFile, 2);
+				} else if (myrank % 4 != 0 && p == 65) {
+					fileNameLength[0] = sumFile.length();
+					MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT,
+							myrank + 2, tag);
 					MPI.COMM_WORLD.Send(sumFile.toCharArray(), 0,
 							sumFile.length(), MPI.CHAR, myrank + 2, tag);
 				}
@@ -95,8 +103,6 @@ class MMult {
 						productFileName.length(), MPI.CHAR, myrank + 1, tag);
 			}
 
-			MPI.COMM_WORLD.Send(product, 0, 1, MPI.OBJECT, 0, tag);
-
 		} else { // my_rank == 0
 			System.out.println("Rank " + myrank + " is on "
 					+ MPI.Get_processor_name());
@@ -114,15 +120,15 @@ class MMult {
 			String file2;
 			if (choice == 1) {
 				file1 = "a1.txt";
-				file2 = "b1.txt";
+				file2 = "a1.txt";
 			} else {
 				file1 = "a3.txt";
 				file2 = "b3.txt";
 			}
-			// file1 = System.getProperty("user.dir") + "/input/" + file1;
-			// file2 = System.getProperty("user.dir") + "/input/" + file2;
-			file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
-			file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file2;
+//			file1 = System.getProperty("user.dir") + "/input/" + file1;
+//			file2 = System.getProperty("user.dir") + "/input/" + file2;
+			 file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
+			 file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file2;
 
 			b = true;
 			while (b) {

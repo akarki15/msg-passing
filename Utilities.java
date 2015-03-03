@@ -129,19 +129,19 @@ public class Utilities {
 		}
 	}
 
-	public String void addAndWrite(String f1, String f2, int level) {
-		
+	public static String addAndWrite(String f1, String f2, int level) {
+
 		String sumFile = f1.split("\\.")[0] + "+" + f2.split("\\.")[0];
 
 		// Convert to actualpaths
-		if (level ==1 ){
-		f1 = System.getProperty("user.dir") + "/product/" + f1;
-		f2 = System.getProperty("user.dir") + "/product/" + f2;		
-		}else {
+		if (level == 1) {
+			f1 = System.getProperty("user.dir") + "/product/" + f1;
+			f2 = System.getProperty("user.dir") + "/product/" + f2;
+		} else {
 			f1 = System.getProperty("user.dir") + "/sum/" + f1;
 			f2 = System.getProperty("user.dir") + "/sum/" + f2;
 		}
-		
+
 		int sizeOfSumMatrix = getSizeOfInput(f1);
 
 		try {
@@ -150,13 +150,16 @@ public class Utilities {
 			BufferedReader br2 = new BufferedReader(
 					new FileReader(new File(f2)));
 			String fullWritePath;
-			if (level==1){
-				fullWritePath = System.getProperty("user.dir") + "/sum/" + sumFile
-			}else{
-				fullWritePathSystem.getProperty("user.dir") + "/sum2/" + sumFile
+			if (level == 1) {
+				fullWritePath = System.getProperty("user.dir") + "/sum/"
+						+ sumFile;
+			} else {
+				fullWritePath = System.getProperty("user.dir") + "/sum2/"
+						+ sumFile;
 			}
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fullWritePath)));
-			
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
+					fullWritePath)));
+
 			String s1 = "";
 			String s2 = "";
 			int[] i1 = {};
