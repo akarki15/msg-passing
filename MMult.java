@@ -36,37 +36,67 @@ class MMult {
 
 			int[][] product = Utilities.multiply(m1, m2);
 			// Utilities.printMatrix(product);
-			String productFileName =message[0]+"_"+message[1]+"_"+message[2]+"_"+message[3]+".txt";			
-			String fullPath = System.getProperty("user.dir") + "/product/" + productFileName;
-			
+			String productFileName = message[0] + "_" + message[1] + "_"
+					+ message[2] + "_" + message[3] + ".txt";
+			String fullPath = System.getProperty("user.dir") + "/product/"
+					+ productFileName;
+
 			Utilities.writeMatrix(product, fullPath);
-			
+
 			int n = message[4]; // represents the size of the input matrix nXn
-			if (myrank%2==0){				// assumes process 0 is not used for actual computation
-					int [] fileNameLength = new int[1];// length of fileName that will be received
-					MPI.COMM_WORLD.Recv(fileNameLength, 0, 1, MPI.INT, myrank-1, tag);
-					System.out.println("Filenamelength is "+fileNameLength[0]);
-					
-					char [] fileNamePreviousRank=new char [fileNameLength[0]];					
-					MPI.COMM_WORLD.Recv(fileNamePreviousRank, 0, fileNameLength[0], MPI.CHAR, myrank-1, tag);
-					
-					for (int i=0;i<fileNamePreviousRank.length;i++){
-						System.out.print(fileNamePreviousRank[i]);
-					}
-					System.out.println();
-					Utilities.addAndWrite(Utilities.charArrayToString(fileNamePreviousRank), productFileName);										
-				
-			}else{
-				 /*process myrank sends the confirmation message to myrank+1 so that myrank+1 can compute the sum*/
-				// send the size of productFileName first so that it can be received properly  
-				int [] fileNameLength = {productFileName.length()};
-				System.out.println("sending "+productFileName);
-				MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT, myrank+1, tag);
-				MPI.COMM_WORLD.Send(productFileName.toCharArray(), 0,productFileName.length() , MPI.CHAR, myrank+1, tag);
+			if (myrank % 2 == 0) { // assumes process 0 is not used for actual
+									// computation
+				int[] fileNameLength = new int[1];// length of fileName that
+													// will be received
+				MPI.COMM_WORLD.Recv(fileNameLength, 0, 1, MPI.INT, myrank - 1,
+						tag);
+
+				char[] fileNamePreviousRank = new char[fileNameLength[0]];
+				MPI.COMM_WORLD.Recv(fileNamePreviousRank, 0, fileNameLength[0],
+						MPI.CHAR, myrank - 1, tag);
+				// do the level 1 addition
+				String sumFile = Utilities.addAndWrite(
+						Utilities.charArrayToString(fileNamePreviousRank),
+						productFileName, 1);
+
+				// level 2 addition for 64 ways--------------------------------
+				if (myrank % 4 == 0 && p == 65) {
+					int[] receivingFileLength = new int[1];// length of fileName
+															// that
+					// will be received
+					MPI.COMM_WORLD.Recv(receivingFileLength, 0, 1, MPI.INT,
+							myrank - 2, tag);
+
+					char[] previousSumFile = new char[receivingFileLength[0]];
+					MPI.COMM_WORLD.Recv(previousSumFile, 0,
+							receivingFileLength[0], MPI.CHAR, myrank - 2, tag);
+					// do the level 2 addition
+					addAndWrite(sumFile,
+							Utilities.charArrayToString(previousSumFile), 2);
+				} else {
+					int[] fileNameLength = { sumFile.length() };
+					MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT, myrank
+							+ f2, tag);
+					MPI.COMM_WORLD.Send(sumFile.toCharArray(), 0,
+							sumFile.length(), MPI.CHAR, myrank + 2, tag);
+				}
+			} else {
+				/*
+				 * process myrank sends the confirmation message to myrank+1 so
+				 * that myrank+1 can compute the sum
+				 */
+				// send the size of productFileName first so that it can be
+				// received properly
+				int[] fileNameLength = { productFileName.length() };
+				System.out.println("sending " + productFileName);
+				MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT, myrank + 1,
+						tag);
+				MPI.COMM_WORLD.Send(productFileName.toCharArray(), 0,
+						productFileName.length(), MPI.CHAR, myrank + 1, tag);
 			}
-			
+
 			MPI.COMM_WORLD.Send(product, 0, 1, MPI.OBJECT, 0, tag);
-	
+
 		} else { // my_rank == 0
 			System.out.println("Rank " + myrank + " is on "
 					+ MPI.Get_processor_name());
@@ -89,11 +119,11 @@ class MMult {
 				file1 = "a3.txt";
 				file2 = "b3.txt";
 			}
-//			file1 = System.getProperty("user.dir") + "/input/" + file1;
-//			file2 = System.getProperty("user.dir") + "/input/" + file2;
+			// file1 = System.getProperty("user.dir") + "/input/" + file1;
+			// file2 = System.getProperty("user.dir") + "/input/" + file2;
 			file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
-			file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/"+ file2;
-			
+			file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file2;
+
 			b = true;
 			while (b) {
 				Scanner reader = new Scanner(System.in);

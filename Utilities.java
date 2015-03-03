@@ -129,14 +129,18 @@ public class Utilities {
 		}
 	}
 
-	public static void addAndWrite(String f1, String f2) {
-		System.out.println(f1 + "--------" + f2);
+	public String void addAndWrite(String f1, String f2, int level) {
+		
 		String sumFile = f1.split("\\.")[0] + "+" + f2.split("\\.")[0];
 
 		// Convert to actualpaths
+		if (level ==1 ){
 		f1 = System.getProperty("user.dir") + "/product/" + f1;
-		f2 = System.getProperty("user.dir") + "/product/" + f2;
-		sumFile = System.getProperty("user.dir") + "/sum/" + sumFile;
+		f2 = System.getProperty("user.dir") + "/product/" + f2;		
+		}else {
+			f1 = System.getProperty("user.dir") + "/sum/" + f1;
+			f2 = System.getProperty("user.dir") + "/sum/" + f2;
+		}
 		
 		int sizeOfSumMatrix = getSizeOfInput(f1);
 
@@ -145,8 +149,14 @@ public class Utilities {
 					new FileReader(new File(f1)));
 			BufferedReader br2 = new BufferedReader(
 					new FileReader(new File(f2)));
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					sumFile)));
+			String fullWritePath;
+			if (level==1){
+				fullWritePath = System.getProperty("user.dir") + "/sum/" + sumFile
+			}else{
+				fullWritePathSystem.getProperty("user.dir") + "/sum2/" + sumFile
+			}
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fullWritePath)));
+			
 			String s1 = "";
 			String s2 = "";
 			int[] i1 = {};
@@ -168,5 +178,6 @@ public class Utilities {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return sumFile;
 	}
 }
