@@ -32,8 +32,8 @@ public class Utilities {
 				 * the input file
 				 */
 				String s = br.readLine();
-				if (row<4){
-//				System.out.println(s+" --->>>>"+i+"++++"+sizeOfCell);
+				if (row < 4) {
+					// System.out.println(s+" --->>>>"+i+"++++"+sizeOfCell);
 				}
 				int[] parsedLine = parseLine(s, starty, sizeOfCell);
 				input[i] = parsedLine;
@@ -42,7 +42,7 @@ public class Utilities {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println("{{{"+startx+" "+starty+"}}}}}");
+		System.out.println("{{{" + startx + " " + starty + "}}}}}");
 		return input;
 
 	}
@@ -111,7 +111,7 @@ public class Utilities {
 	}
 
 	public static void writeMatrix(int[][] m, String fileName) {
-		fileName = System.getProperty("user.dir") + "/product/" + fileName;
+
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
 					fileName)));
@@ -123,6 +123,47 @@ public class Utilities {
 				bw.write(s);
 				bw.write("\n");
 			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void addAndWrite(String f1, String f2) {
+		System.out.println(f1 + "--------" + f2);
+		String sumFile = f1.split("\\.")[0] + "+" + f2.split("\\.")[0];
+
+		// Convert to actualpaths
+		f1 = System.getProperty("user.dir") + "/product/" + f1;
+		f2 = System.getProperty("user.dir") + "/product/" + f2;
+		sumFile = System.getProperty("user.dir") + "/sum/" + sumFile;
+		
+		int sizeOfSumMatrix = getSizeOfInput(f1);
+
+		try {
+			BufferedReader br1 = new BufferedReader(
+					new FileReader(new File(f1)));
+			BufferedReader br2 = new BufferedReader(
+					new FileReader(new File(f2)));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
+					sumFile)));
+			String s1 = "";
+			String s2 = "";
+			int[] i1 = {};
+			int[] i2 = {};
+			int[] buf = {};
+			while ((s1 = br1.readLine()) != null) {
+				s2 = br2.readLine();
+				i1 = parseLine(s1, 0, sizeOfSumMatrix);
+				i2 = parseLine(s2, 0, sizeOfSumMatrix);
+				for (int i = 0; i < sizeOfSumMatrix; i++) {
+					bw.write((i1[i] + i2[i]) + " ");
+				}
+
+				bw.write("\n");
+			}
+			br1.close();
+			br2.close();
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
