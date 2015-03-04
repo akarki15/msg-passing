@@ -43,12 +43,10 @@ class MMult {
 
 			Utilities.writeMatrix(product, fullPath);
 
-			 Utilities.writeMatrix(m1,System.getProperty("user.dir") +
-			 "/blocks/"
-			 + myrank+"_"+1);
-			 Utilities.writeMatrix(m2,System.getProperty("user.dir") +
-			 "/blocks/"
-			 + myrank+"_"+2);
+			Utilities.writeMatrix(m1, System.getProperty("user.dir")
+					+ "/blocks/" + myrank + "_" + 1);
+			Utilities.writeMatrix(m2, System.getProperty("user.dir")
+					+ "/blocks/" + myrank + "_" + 2);
 
 			int n = message[4]; // represents the size of the input matrix nXn
 			if (myrank % 2 == 0) { // assumes process 0 is not used for actual
@@ -96,7 +94,6 @@ class MMult {
 				// send the size of productFileName first so that it can be
 				// received properly
 				int[] fileNameLength = { productFileName.length() };
-				System.out.println("sending " + productFileName);
 				MPI.COMM_WORLD.Send(fileNameLength, 0, 1, MPI.INT, myrank + 1,
 						tag);
 				MPI.COMM_WORLD.Send(productFileName.toCharArray(), 0,
@@ -111,7 +108,7 @@ class MMult {
 			while (b) {
 				Scanner reader = new Scanner(System.in);
 				System.out
-						.println("Press 1 to run MMult on a1 and b1, and 2 to run MMult on a2 and b2");
+						.println("Press 1 to run MMult on a1 and b1, and 2 to run MMult on a3 and b3");
 				choice = reader.nextInt();
 				if (choice == 1 || choice == 2)
 					b = false;
@@ -120,15 +117,14 @@ class MMult {
 			String file2;
 			if (choice == 1) {
 				file1 = "a1.txt";
-				file2 = "a1.txt";
+				file2 = "b1.txt";
 			} else {
 				file1 = "a3.txt";
 				file2 = "b3.txt";
 			}
-//			file1 = System.getProperty("user.dir") + "/input/" + file1;
-//			file2 = System.getProperty("user.dir") + "/input/" + file2;
-			 file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
-			 file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file2;
+
+			file1 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file1;
+			file2 = "/home/cvalentine/cluster-scratch/mpi_inputs/" + file2;
 
 			b = true;
 			while (b) {
@@ -140,16 +136,13 @@ class MMult {
 					b = false;
 			}
 
-			if (choice == 1) {
+			if (choice == 1) { // 8 ways
 				send(file1, file2, tag, 2);
-			} else {
+			} else {// 64 ways 
 				send(file1, file2, tag, 4);
 			}
 
-			// send(tag, 4);
-
 		}
-
 		MPI.Finalize();
 	}
 

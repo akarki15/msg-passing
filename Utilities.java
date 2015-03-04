@@ -22,7 +22,7 @@ public class Utilities {
 			FileReader fileReader = new FileReader(new File(fileName));
 			BufferedReader br = new BufferedReader(fileReader);
 
-			for (int i = 0; i < startx - 1; i++) {
+			for (int i = 0; i < startx; i++) {
 				br.readLine();
 			}
 
@@ -32,17 +32,13 @@ public class Utilities {
 				 * the input file
 				 */
 				String s = br.readLine();
-				if (row < 4) {
-					// System.out.println(s+" --->>>>"+i+"++++"+sizeOfCell);
-				}
 				int[] parsedLine = parseLine(s, starty, sizeOfCell);
 				input[i] = parsedLine;
 			}
 			br.close();
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
-		System.out.println("{{{" + startx + " " + starty + "}}}}}");
+		}		
 		return input;
 
 	}
@@ -69,7 +65,6 @@ public class Utilities {
 		int[] lineInt = new int[sizeOfCell];
 		for (int i = 0; i < sizeOfCell; i++) {
 			lineInt[i] = Integer.parseInt(sList[starty + i]);
-			// System.out.print(lineInt[i]);
 		}
 		return lineInt;
 	}
@@ -86,8 +81,6 @@ public class Utilities {
 
 	static int[][] multiply(int[][] a, int[][] b) {
 		int size = a.length;
-		// printMatrix(a);
-		// printMatrix(b);
 		int[][] output = new int[size][size];
 
 		for (int i = 0; i < size; i++) { // row
